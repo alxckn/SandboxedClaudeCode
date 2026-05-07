@@ -16,7 +16,7 @@ fi
 
 # SSH public keys - bind whichever key types exist
 SSH_PUBKEY_BINDS=""
-for pubkey in "$HOME/.ssh/id_ed25519.pub" "$HOME/.ssh/id_rsa.pub" "$HOME/.ssh/id_ecdsa.pub"; do
+for pubkey in "$HOME/.ssh/id_ed25519.pub" "$HOME/.ssh/id_rsa.pub" "$HOME/.ssh/id_ecdsa.pub" "$HOME/.ssh/id_ed25519_LIN_GM0P2L94.pub"; do
   [ -f "$pubkey" ] && SSH_PUBKEY_BINDS="$SSH_PUBKEY_BINDS --ro-bind $pubkey $pubkey"
 done
 
@@ -70,10 +70,15 @@ bwrap \
   $SSH_PUBKEY_BINDS \
   --ro-bind /usr/bin/gpg /usr/bin/gpg \
   $GPG_ENV \
+  --ro-bind "$HOME/Dotfiles" "$HOME/Dotfiles" \
   --ro-bind "$HOME/.gitconfig" "$HOME/.gitconfig" \
+  --ro-bind "$HOME/.git-pro.conf" "$HOME/.git-pro.conf" \
+  --ro-bind "$HOME/.git-perso.conf" "$HOME/.git-perso.conf" \
   $OPTIONAL_BINDS \
   --ro-bind "$HOME/.local" "$HOME/.local" \
-  --bind "$HOME/.npm" "$HOME/.npm" \
+  --ro-bind "$HOME/Code/PRO" "$HOME/Code/PRO" \
+  --ro-bind "$HOME/.m2/settings.xml" "$HOME/.m2/settings.xml" \
+  --bind "$HOME/.m2/repository" "$HOME/.m2/repository" \
   --bind "$HOME/.claude" "$HOME/.claude" \
   --bind "$HOME/.claude.json" "$HOME/.claude.json" \
   --bind "$PWD" "$PWD" \
