@@ -34,10 +34,18 @@ if [ -S "$XDG_RUNTIME/bus" ]; then
   DBUS_ENV="--setenv DBUS_SESSION_BUS_ADDRESS unix:path=$XDG_RUNTIME/bus"
 fi
 
-# PODMAN
+# PODMAN / DOCKER
 PODMAN_BINDS=""
+PODMAN_ENV=""
 if [ -d "$XDG_RUNTIME/podman" ]; then
   PODMAN_BINDS="--bind $XDG_RUNTIME/podman $XDG_RUNTIME/podman"
+  if [ -S "$XDG_RUNTIME/podman/podman.sock" ]; then
+    PODMAN_BINDS="$PODMAN_BINDS --dir /var/run --symlink $XDG_RUNTIME/podman/podman.sock /var/run/docker.sock"
+    PODMAN_ENV="--setenv CONTAINER_HOST unix://$XDG_RUNTIME/podman/podman.sock"
+    PODMAN_ENV="$PODMAN_ENV --setenv DOCKER_HOST unix://$XDG_RUNTIME/podman/podman.sock"
+    PODMAN_ENV="$PODMAN_ENV --setenv TESTCONTAINERS_RYUK_DISABLED true"
+    PODMAN_ENV="$PODMAN_ENV --setenv TESTCONTAINERS_CHECKS_DISABLE true"
+  fi
 fi
 
 # zellij pipe
@@ -118,6 +126,7 @@ bwrap \
   --setenv USER "$USER" \
   $DBUS_ENV \
   $ZELLIJ_ENV \
+  $PODMAN_ENV \
   --share-net \
   --unshare-pid \
   --die-with-parent \
